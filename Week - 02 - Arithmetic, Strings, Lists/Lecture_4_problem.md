@@ -1,83 +1,124 @@
-# Week 2 - Lecture 4 - Problem: Message Organizer
-
-**_Note: You only need to read and understand the problem before the lecture. You are not required to produce a programming solution._**
+# Week 2 - Lecture 4 - Problem: Contact Book
 
 ## ILO
 
-* **KU1:** Grasp the relation between source code, the interpreter, and the machine.
 * **KU2:** Choose appropriate data types and data structures for different kinds of data, depending on their performance characteristics.
 * **KU3:** Design algorithms to solve simple programming problems.
 * **CS1:** Structure small programs by the use of iterations, functions, modules, classes, and methods.
 * **CS3:** Form readable, descriptive and well-documented program code.
-* **CS5:** Express mathematical formulas as programming language expressions and algorithms.
 * **CS6:** Build basic interactive programs with text-based and graphical user interfaces.
-* **CS8:** Use programming tools such as text editor, command line interface, and IDE.
 * **CS9:** Use standard libraries and follow best programming practices.
 
 ## Objectives
 
 After completing this problem, you should be able to:
 
-1. Store and manipulate text using strings and string methods.
-2. Split a message into a list of words.
-3. Use indexing and slicing to inspect parts of a string or list.
-4. Use a tuple to store a fixed summary of message information.
-5. Change a list in place using a list method.
-6. Pass a named argument to a function.
-7. Encode a string as UTF-8 bytes and decode it back into a string.
-8. Write readable code with descriptive names and suitable formatting.
+1. Store a contact as a single string containing both name and phone number.
+2. Store several such strings in one list.
+3. Split a contact string to separate the name from the phone number.
+4. Recognize the risk of keeping name and phone number combined in one string.
+5. Combine name and phone number into a tuple instead.
+6. Store several tuples in a single list of contacts.
+7. Add a new contact to the list.
+8. Search for a contact by name.
+9. Delete a contact by name.
+10. Build a menu loop that repeats until the user chooses to quit.
 
 ## Background
 
-Messaging systems often prepare text before displaying or storing it. A program may need to clean a message, count its words, show a preview, and check how it is represented when sent over a network.
+A simple contact book stores a name together with a phone number. A first attempt at this might store each contact as one string, for example `"Alice 070-1112233"`, and keep all these strings in a single list. To use the name or the phone number separately, the string must be split apart every time. This works, but it is fragile: the split only works correctly if the format of every string is exactly the same, and it is easy to make a mistake when reading or building the string.
 
-In this problem, you will create a small message organizer. The program receives one message and produces a cleaned version, a list of its words, a short preview, and information about its UTF-8 encoding.
-
-A string is an immutable sequence of characters. This means that string methods create a new string rather than changing the original string. A list is mutable, so its contents can be changed in place.
+A better design (which we'll implement later) stores each contact as a tuple `(name, phone_number)`. All contacts can then be kept in one list of tuples, so the name and phone number stay together as separate values, not glued into one string.
 
 ## Task
 
-Write a program that:
+### Part 1: One combined string per contact
 
-1. Reads a message from the user.
-2. Removes unnecessary whitespace from the beginning and end of the message.
-3. Splits the cleaned message into a list of words.
-4. Sorts the list of words in place, ignoring letter case.
-5. Replaces the first word in the sorted list with its uppercase version.
-6. Creates a tuple containing:
-   - the number of words,
-   - the first word after the replacement, and
-   - the last word in the message.
-7. Creates a preview containing the first three words, or all words if the message has fewer than three words.
-8. Encodes the cleaned message using UTF-8.
-9. Decodes the bytes back into a string.
-10. Prints the results.
+1. Create a list called `contacts` where each element is one string containing a name and a phone number, for example `"Alice 070-1112233"`.
+2. For each contact string, split it to get the name and the phone number separately.
+3. Print each name together with its phone number.
+4. Add a new contact by appending a new combined string to the list.
+5. Discuss what could go wrong with this approach (for example, a name with a space in it, or a missing phone number, breaking the split).
 
-Use a function with a named argument to create the preview. For example, the function may have a parameter named `limit`, and the function call should pass the argument by name.
+### Part 2: List of tuples
 
-Use a list method such as `.sort()` or `.reverse()` to change a list in place. The program should make clear that this operation changes the list itself.
+1. Combine each name and phone number into a tuple, `(name, phone_number)`.
+2. Store all contact tuples in a single list called `contacts`.
+3. Print every contact by looping over the list, unpacking each tuple into `name` and `phone_number`.
+4. **Add contact:** append a new `(name, phone_number)` tuple to `contacts`.
+5. **Search contact:** loop over `contacts`, and print the phone number of the contact whose name matches, or a message if no match is found.
+6. **Delete contact:** loop over `contacts` to find the tuple whose name matches, then remove that tuple from the list using `.remove()` or by rebuilding the list without it. Print a message if no matching contact is found.
+
+### Part 3: Menu loop
+
+1. Wrap the add, search, delete, and print operations from Part 2 in a menu that repeats using a `while` loop.
+2. Each time through the loop, print the menu options and read the user's choice.
+3. Call the matching operation based on the choice:
+   - Add contact
+   - Search contact
+   - Delete contact
+   - Print all contacts
+   - Quit
+4. Use `break` to exit the loop when the user chooses to quit.
+5. Use `continue` or an `else` branch to handle an invalid choice, then show the menu again.
 
 ## Example Run
 
 ```text
-Enter a message:   Meet me at the café tomorrow   
+-- Part 1: combined strings --
+Alice: 070-1112233
+Bob: 070-4445566
+Carol: 070-7778899
 
-Cleaned message: Meet me at the café tomorrow
-Words: ['AT', 'café', 'me', 'Meet', 'the', 'tomorrow']
-Message summary: (6, 'AT', 'tomorrow')
-Preview: AT café me
-UTF-8 bytes: b'Meet me at the caf\xc3\xa9 tomorrow'
-Decoded message: Meet me at the café tomorrow
+-- Part 2: list of tuples --
+Alice: 070-1112233
+Bob: 070-4445566
+Carol: 070-7778899
+
+Add contact: Dana 070-0001122
+Alice: 070-1112233
+Bob: 070-4445566
+Carol: 070-7778899
+Dana: 070-0001122
+
+Search for: Bob
+Bob's number is 070-4445566
+
+Delete: Carol
+Contact Carol deleted.
+Alice: 070-1112233
+Bob: 070-4445566
+Dana: 070-0001122
+
+-- Part 3: menu loop --
+Contact Book
+1. Add contact
+2. Search contact
+3. Delete contact
+4. Print all contacts
+5. Quit
+Choose an option: 1
+Enter name: Eve
+Enter phone number: 070-3334455
+Contact Eve added.
+
+Contact Book
+1. Add contact
+2. Search contact
+3. Delete contact
+4. Print all contacts
+5. Quit
+Choose an option: 5
+Goodbye.
 ```
 
 ## Requirements
 
-- Use at least one function for part of the processing.
-- Use string methods such as `.strip()`, `.upper()`, and `.split()`.
-- Use a list to store the words and sort it in place with a list method.
-- Use indexing to access the first and last words.
-- Use slicing to create the preview.
-- Use a tuple for the message summary.
-- Use a named argument when calling the preview function.
-- Use `.encode("utf-8")` and `.decode("utf-8")`.
-- Assume that the user enters a message containing at least one word.
+- Use one list of combined strings in Part 1, and split each string to read the name and phone number.
+- Use tuples in Part 2 to keep each name and phone number as separate values.
+- Use a list to store all contact tuples.
+- Use a loop to add, print, search, and delete contacts.
+- Use tuple unpacking when reading each contact, for example `name, phone_number = contact`.
+- When deleting, handle the case where the name is not found in `contacts`.
+- In Part 3, use a `while` loop that keeps showing the menu until the user quits.
+- In Part 3, use `break` to leave the loop and handle an invalid menu choice without crashing.
