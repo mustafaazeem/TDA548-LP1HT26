@@ -9,7 +9,7 @@ with open(IN_FILE, 'r') as input_file:
 
 contacts_dict = {}
 # result
-if any(letter not in {'ACTG'} for letter in result)
+# if any(letter not in {'ACTG'} for letter in result)
 
 for line in file_data.splitlines():
     # print(line)

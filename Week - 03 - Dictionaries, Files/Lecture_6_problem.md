@@ -1,4 +1,4 @@
-# Week 3 - Lecture 6 - Problem: Weather Station Data Stream
+# Week 3 - Lecture 6 - Problem: Generators and Safe File Reading
 
 ## ILO
 
@@ -12,210 +12,183 @@
 
 After completing this problem, you should be able to:
 
-1. Validate data before converting or processing it.
-2. Distinguish malformed records from values outside an allowed range.
-3. Use `try` and `except` to handle conversion errors.
-4. Write a generator function using `yield`.
-5. Read and process one record at a time.
-6. Build a generator that filters a data stream.
-7. Stop a search as soon as the required result is found.
-8. Explain why a generator is useful for a large or continuous data source.
+1. Explain the difference between `return` and `yield`.
+2. Write a simple generator function.
+3. Read a text file line by line.
+4. Remove whitespace and skip empty lines.
+5. Catch `ValueError` and handle invalid data safely.
+6. Build a dictionary from file content.
 
 ## Background
 
-A weather station sends measurements continuously. Each measurement contains a time, a temperature, and a humidity value. The data arrives as text records in the following format:
+A normal function uses `return` to finish and send back one result. A generator uses `yield` to send back values one at a time. This is useful when we read a file and want to process each line without storing every line in a list first.
+
+In this problem, we will read a text file containing contact information. Each line contains a contact in the form:
 
 ```text
-time;temperature;humidity
+name;phone_number
 ```
 
-For example:
+Example:
 
 ```text
-08:00;12.5;86
-08:10;13.1;74
-08:20;bad;73
-08:30;14.0;105
-08:40;15.2;70
+Alice; [070-123 45 67]
+Bob; [073-345 67 89]
+Carol; [076-456 78 90]
 ```
 
-Some records may be invalid. A record is valid when:
-
-- it has exactly three fields;
-- the time is not empty;
-- the temperature is a number between `-50` and `60` degrees Celsius; and
-- the humidity is an integer between `0` and `100` percent.
-
-The program should process the readings as a stream. It should not first create a second list containing all valid readings. A generator should yield each valid reading when it is needed.
+Some lines may be broken or empty. The program should skip invalid lines instead of crashing.
 
 ## Task
 
-### Part 1: Validate one record
+### Part 1: Compare `return` and `yield`
 
-Write a function `parse_reading(line)` that receives one line of text.
+Write two small functions:
 
-The function should:
+```python
+def numbers_return():
+    return [1, 2, 3]
 
-1. Remove the newline and surrounding whitespace.
-2. Split the line into fields using `;`.
-3. Reject the line if it does not contain exactly three fields.
-4. Convert temperature to a `float` and humidity to an `int`.
-5. Reject the line if either conversion raises `ValueError`.
-6. Reject values outside the allowed ranges.
-7. Return a tuple `(time, temperature, humidity)` for a valid line.
-8. Return `None` for an invalid line.
+
+def numbers_yield():
+    yield 1
+    yield 2
+    yield 3
+```
+
+Then test both functions:
+
+```python
+print(numbers_return())
+for value in numbers_yield():
+    print(value)
+```
+
+Explain the difference between the two functions in your own words.
+
+### Part 2: Write a simple generator
+
+Create a function `my_range(start, stop, step=1)` that yields integers from `start` up to, but not including, `stop`.
 
 Example:
 
 ```python
-parse_reading("08:00;12.5;76")
-# ('08:00', 12.5, 76)
-
-parse_reading("08:20;bad;73")
-# None
-```
-
-Do not let an invalid record crash the program.
-
-### Part 2: Generate valid readings
-
-Write a generator function `valid_readings(lines)` that receives an iterable of text lines and yields only valid readings:
-
-```python
-def valid_readings(lines):
-    for line in lines:
-        reading = parse_reading(line)
-        if reading is not None:
-            yield reading
-```
-
-Test it with this data:
-
-```python
-data = [
-    "08:00;12.5;86",
-    "08:10;13.1;74",
-    "08:20;bad;73",
-    "08:30;14.0;105",
-    "08:40;15.2;70"
-]
-
-for reading in valid_readings(data):
-    print(reading)
+for number in my_range(1, 10, 2):
+    print(number)
 ```
 
 Expected output:
 
 ```text
-('08:00', 12.5, 86)
-('08:10', 13.1, 74)
-('08:40', 15.2, 70)
+1
+3
+5
+7
+9
 ```
 
-The invalid records are skipped, but the generator does not need to build a separate list of valid records.
+Your function must use `yield`.
 
-### Part 3: Generate alerts
+### Part 3: Parse one contact line
 
-Write a second generator `humidity_alerts(readings)` that receives an iterable of valid readings and yields only readings where the humidity is at least 80:
+Write a function `parse_contact(line)` that receives one line of text.
 
-```python
-def humidity_alerts(readings):
-    for time, temperature, humidity in readings:
-        if humidity >= 80:
-            yield time, temperature, humidity
-```
+The function should:
 
-Use the generators together:
-
-```python
-for reading in humidity_alerts(valid_readings(data)):
-    print("High humidity:", reading)
-```
-
-This is a generator pipeline: the data passes through one stage at a time.
-
-### Part 4: Find the first cold reading
-
-Write a function `first_below(readings, limit)` that returns the first reading whose temperature is below `limit`.
-
-Return `None` if no reading matches. Stop immediately when a matching reading is found; do not process the remaining readings.
+1. Remove surrounding whitespace and any unwanted characters.
+2. Skip empty lines.
+3. Split the line using `;`.
+4. Return a tuple `(name, phone)` for a valid line.
+5. Return `None` for an invalid line.
 
 Example:
 
 ```python
-first_below(valid_readings(data), 14)
-# ('08:00', 12.5, 76)
+parse_contact("Alice;070-123 45 67")
+# ("Alice", "070-123 45 67")
+
+parse_contact("Broken line")
+# None
 ```
 
-Explain why returning immediately is useful when `readings` is a generator or when the data source is very large.
+Use `try` and `except` so that a line with too few or too many values does not crash the program.
 
-### Part 5: Read from a file
+### Part 4: Read the file one line at a time
 
-Create a file called `weather.txt` with the following contents:
-
-```text
-08:00;12.5;86
-08:10;13.1;74
-08:20;bad;73
-08:30;14.0;105
-08:40;15.2;70
-```
-
-Use the file itself as the input to the generator:
+Write a generator function `contact_generator(filename)` that reads a file and yields valid contact tuples.
 
 ```python
-with open("weather.txt", "r") as file:
-    for reading in valid_readings(file):
-        print(reading)
+def contact_generator(filename):
+    with open(filename, "r", encoding="utf-8") as file:
+        for line in file:
+            contact = parse_contact(line)
+            if contact is not None:
+                yield contact
 ```
 
-The file can be processed one line at a time. The complete file does not need to be loaded into a separate list first.
+Then write a function `load_contacts(filename)` that loops through the generator and stores the names as keys and phone numbers as values in a dictionary.
+
+Example:
+
+```python
+contacts = load_contacts("contacts.txt")
+print(contacts)
+```
+
+### Part 5: Handle invalid data safely
+
+Write a short example showing how `ValueError` can happen.
+
+```python
+try:
+    number = int("abc")
+except ValueError:
+    print("That is not a valid integer.")
+```
+
+Then explain in one or two sentences why `try` and `except` are useful when reading files.
 
 ## Example Run
 
+```python
+for contact in contact_generator("contacts.txt"):
+    print(contact)
+```
+
+Possible output:
+
 ```text
-Valid readings:
-08:00: 12.5 C, humidity 86%
-08:10: 13.1 C, humidity 74%
-08:40: 15.2 C, humidity 70%
-
-High humidity readings:
-08:00: 12.5 C, humidity 86%
-
-First reading below 14 C:
-08:00: 12.5 C, humidity 86%
+('Alice', '070-123 45 67')
+('Bob', '073-345 67 89')
+('Carol', '076-456 78 90')
 ```
 
 ## Requirements
 
-- Validate each record before using its values.
-- Reject records with the wrong number of fields.
-- Catch `ValueError` when converting temperature or humidity.
-- Reject temperatures outside `-50` to `60` degrees Celsius.
-- Reject humidity outside `0` to `100` percent.
-- Return `None` for invalid records instead of crashing.
-- Use at least two generator functions containing `yield`.
-- Process valid readings one at a time.
-- Use a generator pipeline for the humidity alerts.
-- Stop `first_below()` as soon as a matching reading is found.
-- Process the file directly instead of first calling `readlines()`.
-- Do not use a bare `except:`.
+- Use `yield` in at least one generator function.
+- Explain the difference between `return` and `yield`.
+- Read a file line by line instead of loading the whole file at once.
+- Strip whitespace from each line.
+- Skip empty lines.
+- Handle invalid lines without crashing.
+- Use `try` and `except` for safe error handling.
+- Build a dictionary from valid contact entries.
+- Keep the solution simple and beginner-friendly.
 
 ## Discussion Questions
 
 1. What is the difference between `return` and `yield`?
-2. When does the body of a generator function begin running?
-3. Why can `valid_readings(file)` process a large file efficiently?
-4. Why can a generator normally be consumed only once?
-5. What is the difference between a malformed record and an out-of-range value?
-6. Why should `parse_reading()` return `None` for an invalid record?
-7. Why should `first_below()` return immediately after finding a match?
+2. When does a generator function start running?
+3. Why is it useful to read a file one line at a time?
+4. What happens if `line.split(";")` gives the wrong number of values?
+5. Why should invalid lines be skipped instead of stopping the program?
+6. Why do we use `strip()` when reading text from a file?
 
 ## Extension Challenges
 
-1. Add a wind-speed field and validate it as a non-negative number.
-2. Write a generator that yields only readings from a selected time interval.
-3. Write a generator that yields the running average temperature.
-4. Write a generator that yields a warning when the temperature changes by more than 5 degrees between consecutive valid readings.
-5. Count invalid records without storing them.
+1. Make the contact file contain a blank line and handle it safely.
+2. Allow names or phone numbers to have extra spaces before or after the semicolon.
+3. Add a second dictionary entry for a contact already in the file and print a message instead of overwriting it.
+4. Write a generator that reads only the first 5 valid contacts.
+5. Create a second file with bad data and test that your program still works.
 6. Write valid readings to a new output file while the input file is processed.
