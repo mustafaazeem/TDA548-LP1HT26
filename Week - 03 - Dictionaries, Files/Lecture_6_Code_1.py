@@ -1,3 +1,6 @@
+'''
+Simple generator function examples 
+'''
 def generate_123_v1():
     '''
     will generate integers 1, 2, and 3 in a row

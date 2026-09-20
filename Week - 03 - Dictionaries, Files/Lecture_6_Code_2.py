@@ -1,3 +1,6 @@
+'''
+Building a dictionary from a file with generator object
+'''
 INPUT_FILE = 'Lecture_5_contacts.txt'
 
 def file_generator(file=INPUT_FILE):    
