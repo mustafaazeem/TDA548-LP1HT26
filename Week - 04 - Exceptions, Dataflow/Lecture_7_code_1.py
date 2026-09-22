@@ -1,3 +1,6 @@
+'''
+Basic matrix representation, and how to print it in multiple ways. 
+'''
 matrix = [ [0, 1, 8], [1, 7, 9, 8, 3],  [3, 1, 3, 4] ]
 
 matrix_representation_2 = [

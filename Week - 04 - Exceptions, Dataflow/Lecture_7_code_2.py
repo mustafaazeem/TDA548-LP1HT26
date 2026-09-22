@@ -1,3 +1,7 @@
+'''
+A generator to yield one matrix row each time next() is called
+Also, we learn how to handle errors with try-except blocks 
+'''
 scores = [
     ["12", "15", "missing"],
     ["8", "10", "9"],

@@ -1,3 +1,7 @@
+'''
+A functional (data flow driven approach) to write code. Note how we call
+functions in a chain at line 44
+'''
 scores = [
     ["12", "15", "missing"],
     ["8", "10", "9"],
