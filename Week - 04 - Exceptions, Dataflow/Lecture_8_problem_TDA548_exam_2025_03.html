@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TDA548 Exam 2025-03</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      color: #202124;
+      background: #f5f6f8;
+    }
+
+    body {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: #fff;
+    }
+
+    h2 {
+      margin-top: 2.5rem;
+      border-bottom: 1px solid #d9dce1;
+      padding-bottom: 0.35rem;
+    }
+
+    h3 {
+      margin-top: 1.8rem;
+    }
+
+    code {
+      padding: 0.1rem 0.3rem;
+      border-radius: 3px;
+      background: #f0f1f3;
+    }
+
+    pre {
+      overflow-x: auto;
+      padding: 1rem;
+      border-radius: 6px;
+      background: #f0f1f3;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      margin: 1rem 0;
+    }
+
+    li {
+      margin: 0.45rem 0;
+    }
+  </style>
+</head>
+<body>
+  <h2>Q1 Escape! (15 points)</h2>
+
+  <p>Consider a spherical planetoid of mass <var>M</var> and radius <var>r</var>. Consider further an inertial object at the surface of the planetoid, moving with a velocity <var>V</var> directly away from the planetoid. If the object moves slowly, it will fall back onto the planetoid. Otherwise, it will be able to escape its gravitational field. If so, it will continue to slow down, approaching but never quite reaching its hyperbolic excess speed <var>e</var>.</p>
+
+  <p>The minimum velocity to escape is called <var>v</var>, and is given by the following equation:</p>
+
+  <p class="equation"><var>v</var><sup>2</sup><var>r</var> = 2<var>G</var><var>M</var></p>
+
+  <p>The hyperbolic excess speed <var>e</var> is given by the equation:</p>
+
+  <p class="equation"><var>e</var><sup>2</sup> = <var>V</var><sup>2</sup> - <var>v</var><sup>2</sup></p>
+
+  <p>Write a function <code>escape</code>, taking as arguments <code>M</code>, <code>r</code> and <code>V</code>, which tests if the object will escape the gravitational field. If it escapes, <code>escape</code> should print the hyperbolic excess speed. Otherwise it should print <code>The object won't escape</code>.</p>
+
+  <p>Assume <var>G</var> = 6.674 &times; 10<sup>&minus;11</sup>.</p>
+
+  <h3>Example run</h3>
+
+  <pre><code>&gt;&gt;&gt; escape(7.3e22, 1.7e6, 5000)  # moon example
+Excess speed: 4389.557126260675
+
+&gt;&gt;&gt; escape(6e24, 5.6e6, 5000)  # earth example
+The object won't escape</code></pre>
+
+  <h2>Q2 Single-Rotation (20 points)</h2>
+
+  <p>You will implement the "single rotation" cellular automation. A cellular automaton is a function that changes the state of a matrix (or grid) of cells. A cell can either be occupied or empty. By iterating this function, one can observe interesting behavior. The following picture shows the evolution of an example matrix of cells, under the single-rotation automaton.</p>
+
+  <img src="collision.gif" alt="Evolution of the single-rotation automaton">
+
+  <p>We will represent the matrix of cells as a list of lists. An empty cell will contain <code>None</code>. Other cells may contain any other value. Our automaton works by conceptually dividing the matrix into 2 by 2 groups, thus forming groups of 4 cells. The only effect of the automaton is to rotate a group of four cells <strong>if and only if</strong> the group has a single occupied cell. Other groups are left alone. For even iterations, the groups are divided across grid lines of even index. For odd iterations, the groups are divided across grid lines of odd index. Here is an example of several iterations:</p>
+
+  <img src="animation.gif" alt="Animation of the single-rotation automaton">
+
+  <h3>Attention</h3>
+
+  <ul>
+    <li>Assume that a matrix is represented by a list of rows, themselves represented as lists. All rows have equal length. The size of the matrix is arbitrary, but has at least one element. There is no sharing of rows in a matrix.</li>
+    <li>An empty cell is represented by <code>None</code>. Any other value represents an occupied cell.</li>
+    <li>The division into groups might leave some groups incomplete near the edge of the grid. For this exercise, incomplete groups will never be rotated. You will have to detect this situation specifically.</li>
+    <li>In the above picture rotation happens always clockwise. You can rotate in the other direction, but all rotations must be in the same direction.</li>
+  </ul>
+
+  <h3>Tasks</h3>
+
+  <ul>
+    <li>Define the function <code>is_group_complete(m, i, j)</code>, which determines if the cell group located in matrix <code>m</code> starting at position <code>i</code>, <code>j</code> is complete. To clarify, a complete group is one that has its four cells within the boundaries of the whole grid. Return the result as a boolean. <strong>(5 points)</strong></li>
+    <li>Define the function <code>is_single_group(m, i, j)</code>, which tests if the cell group located in matrix <code>m</code> starting at position <code>i</code>, <code>j</code> has exactly one occupied cell and returns the result as a boolean. This function assumes that the group is complete. <strong>(5 points)</strong></li>
+    <li>Define the function <code>rotate_group(m, i, j)</code>. This function must <strong>modify</strong> the matrix <code>m</code> by rotating a group located in matrix <code>m</code> starting at position <code>i</code>, <code>j</code>. <strong>(5 points)</strong></li>
+    <li>Define the function <code>iteration(n, m)</code>, which <strong>modifies</strong> the matrix by rotating all the groups in matrix <code>m</code> according to the single-rotation rule defined above, for a single iteration. The number <code>n</code> is the iteration we're at. <strong>(5 points)</strong></li>
+  </ul>
+</body>
+</html>
