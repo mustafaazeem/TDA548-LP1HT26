@@ -14,3 +14,12 @@ First lecture theory, second lecture coding is a good suggestion, I like it
 
 # Dictionary
 do not include complex string cleaning 
+
+Lab2 starts after lecture 9 **objects**. Its better that Lab1 is submitted before that. 
+
+
+# Lab 1
+some stop words are not included, like '"' which appears a lot in web urls 
+
+# Lab 2
+- The name of downloadable zip is lab3.zip, which may induce confusion 
